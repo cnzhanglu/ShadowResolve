@@ -107,10 +107,10 @@ def read_domain_list(file_io: io.TextIOBase):
 
 
 # 处理单个域名的 DNS 查询
-def process_domain(logger, dns_handler, dnsserver, domain_list, source_ip, output_dir):
+def process_domain(logger, dns_handler, dnsserver, domain_list, ecs_ip=None, src_ip=None, output_dir="output"):
     sub_response = []
     for domain, record_type in domain_list:
-        response = dns_handler.dns_query(dnsserver, domain, record_type, client_ip=source_ip, src=source_ip)
+        response = dns_handler.dns_query(dnsserver, domain, record_type, client_ip=ecs_ip, src=src_ip)
         logger.debug(f"DNS query for {domain} from {source_ip}: {response}")
         sub_response.append(response)
 
@@ -157,8 +157,18 @@ if __name__ == "__main__":
             output_dir = os.path.join('output', dns_servername)
             os.makedirs(output_dir, exist_ok=True)
             # 将源IP和域名列表提交到线程池
-            future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, source_ip,
-                                     output_dir)
+            if args.spoof_source and not args.ecs_enable:
+                future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, None,
+                                         source_ip, output_dir)
+            elif not args.spoof_source and args.ecs_enable:
+                future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, source_ip,
+                                         None, output_dir)
+            elif args.spoof_source and args.ecs_enable:
+                future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, source_ip,
+                                         source_ip, output_dir)
+            elif not args.spoof_source and not args.ecs_enable:
+                future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, None,
+                                         None, output_dir)
             # 在任务完成时更新进度条
             future.add_done_callback(lambda x: progress_bar.update())
 

@@ -111,18 +111,14 @@ def process_domain(logger, dns_handler, dnsserver, domain_list, ecs_ip=None, src
     sub_response = []
     for domain, record_type in domain_list:
         response = dns_handler.dns_query(dnsserver, domain, record_type, client_ip=ecs_ip, src=src_ip)
-        logger.debug(f"DNS query for {domain} from {source_ip}: {response}")
+        logger.debug(f"DNS query for {domain} from {src_ip}: {response}")
         sub_response.append(response)
 
     # 将查询结果写入 CSV 文件
-    csv_file = os.path.join(output_dir, f"{source_ip}.csv")
+    csv_file = os.path.join(output_dir, f"{src_ip}.csv")
     with open(csv_file, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerows(sub_response)  # response 需要替换为实际的查询结果变量名
-
-    # global completed_threads
-    # completed_threads += 1
-    # # update_progress()
+        writer.writerows(sub_response)
 
 
 # 主函数

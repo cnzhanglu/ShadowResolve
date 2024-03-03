@@ -99,7 +99,7 @@ class DNSHandler:
             if dns_response is not None:
                 dns_resp_bytes = bytes(dns_response[DNS])
                 dns_resp_msg = dns_message.from_wire(dns_resp_bytes)
-                rcode = dns_resp_msg.rcode().value
+                rcode = dns_resp_msg.rcode()
                 # 当 rcode 为 NXDOMAIN 时，不需要返回任何内容
                 if rcode == 3:
                     return "NXDOMAIN", domain, record_type, ""
@@ -155,6 +155,7 @@ def rcode_to_string(rcode):
 if __name__ == "__main__":
     dns_handler = DNSHandler()
     loger = setup_logger('run.log')
+    loger.setLevel("DEBUG")
     loger.info(dns_handler.dns_query('192.168.123.1', 'www.baidu.com', 'A', '192.168.123.22'))
     loger.info(dns_handler.dns_query('192.168.123.1', 'www.baidu.com', 'A'))
     loger.info(dns_handler.dns_query('192.168.123.1', 'www.baidu.com', 'A', src='1.1.1.1'))

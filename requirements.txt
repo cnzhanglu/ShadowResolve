@@ -1,0 +1,3 @@
+tqdm~=4.66.2
+dnspython~=2.6.1
+scapy~=2.5.0

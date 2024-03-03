@@ -118,6 +118,7 @@ def process_domain(logger, dns_handler, dnsserver, domain_list, ecs_ip=None, src
     csv_file = os.path.join(output_dir, f"{src_ip}.csv")
     with open(csv_file, 'w', newline='') as file:
         writer = csv.writer(file)
+        writer.writerow(["解析状态", "域名", "记录类型", "解析结果"])
         writer.writerows(sub_response)
 
 

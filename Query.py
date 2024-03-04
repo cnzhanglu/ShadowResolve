@@ -21,9 +21,9 @@ def parse_arguments():
 
     # 添加命令行参数
     parser.add_argument('-s', '--spoof-source', action='store_true',
-                        help='是否伪造源地址。默认为否。如果提供文件路径作为参数，则视为启用。')
+                        help='是否伪造源地址。默认为否。')
     parser.add_argument('-e', '--ecs-enable', action='store_true',
-                        help='是否使用 ECS 携带源地址。默认为否。如果提供文件路径作为参数，则视为启用。')
+                        help='是否使用 ECS 携带源地址。默认为否。')
     parser.add_argument('-d', '--dnsserver', type=validate_ip_address, required=True,
                         help='指定 DNS 服务器地址。必须。')
     parser.add_argument('-t', '--thread', type=int, default=10,
@@ -31,7 +31,7 @@ def parse_arguments():
 
     # -a 参数当 -s 或 -e 参数出现时必须提供
     parser.add_argument('-a', '--address-list', type=argparse.FileType('r'),
-                        help='指定源地址的地址列表文件路径。',
+                        help='指定源地址的地址列表文件路径。参数当 -s 或 -e 参数出现时必须提供',
                         required='-s' in sys.argv or '--spoof-source' in sys.argv or '-e' in sys.argv or '--ecs-enable' in sys.argv)
     parser.add_argument('--debug', action='store_true', dest='debug',
                         help='Enable debug 打印所有日志')

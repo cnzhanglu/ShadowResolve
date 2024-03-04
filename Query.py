@@ -118,9 +118,9 @@ def process_domain(logger, dns_handler, dnsserver, domain_list, ecs_ip=None, src
     if src_ip and not ecs_ip:
         csv_file = os.path.join(output_dir, f"src_{src_ip}.csv")
     elif ecs_ip and not src_ip:
-        csv_file = os.path.join(output_dir, f"ecs_{src_ip}.csv")
+        csv_file = os.path.join(output_dir, f"ecs_{ecs_ip}.csv")
     elif ecs_ip and src_ip:
-        csv_file = os.path.join(output_dir, f"srcAndEcs_{src_ip}.csv")
+        csv_file = os.path.join(output_dir, f"srcAndEcs_{ecs_ip}.csv")
     else:
         csv_file = os.path.join(output_dir, f"None_{dnsserver}.csv")
 
@@ -147,7 +147,10 @@ if __name__ == "__main__":
     domain_list = read_domain_list(args.domain_list)
 
     # 生成不同源 IP 地址列表
-    source_ips = expand_addresses(args.address_list)  # 举例
+    if not args.spoof_source and not args.ecs_enable:
+        source_ips = ["1.1.1.1"]
+    else:
+        source_ips = expand_addresses(args.address_list)  # 举例
 
     dns_servername = args.dnsserver
     # 创建线程池
@@ -162,10 +165,10 @@ if __name__ == "__main__":
             output_dir = os.path.join('output', dns_servername)
             os.makedirs(output_dir, exist_ok=True)
             # 将源IP和域名列表提交到线程池
-            if args.spoof_source and not args.ecs_enable:
+            if args.spoof_source and not args.ecs_enable:  # src
                 future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, None,
                                          source_ip, output_dir)
-            elif not args.spoof_source and args.ecs_enable:
+            elif not args.spoof_source and args.ecs_enable:  # ecs
                 future = executor.submit(process_domain, logger, dns_handler, dns_servername, domain_list, source_ip,
                                          None, output_dir)
             elif args.spoof_source and args.ecs_enable:

@@ -115,7 +115,15 @@ def process_domain(logger, dns_handler, dnsserver, domain_list, ecs_ip=None, src
         sub_response.append(response)
 
     # 将查询结果写入 CSV 文件
-    csv_file = os.path.join(output_dir, f"{src_ip}.csv")
+    if src_ip and not ecs_ip:
+        csv_file = os.path.join(output_dir, f"src_{src_ip}.csv")
+    elif ecs_ip and not src_ip:
+        csv_file = os.path.join(output_dir, f"ecs_{src_ip}.csv")
+    elif ecs_ip and src_ip:
+        csv_file = os.path.join(output_dir, f"srcAndEcs_{src_ip}.csv")
+    else:
+        csv_file = os.path.join(output_dir, f"None_{dnsserver}.csv")
+
     with open(csv_file, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["解析状态", "域名", "记录类型", "解析结果"])

@@ -30,7 +30,7 @@ def parse_arguments():
                         help='指定线程数量，数量多，就快。但是不要超过10倍的cpu核心数，否则可能起到反效果')
 
     # -a 参数当 -s 或 -e 参数出现时必须提供
-    parser.add_argument('-a', '--address-list', type=argparse.FileType('r'),
+    parser.add_argument('-a', '--address-list', type=argparse.FileType('r', encoding="utf-8"),
                         help='指定源地址的地址列表文件路径。参数当 -s 或 -e 参数出现时必须提供',
                         required='-s' in sys.argv or '--spoof-source' in sys.argv or '-e' in sys.argv or '--ecs-enable' in sys.argv)
     parser.add_argument('--debug', action='store_true', dest='debug',
@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument('--timeout', type=int, default=3,
                         help='超时时间')
 
-    parser.add_argument('domain_list', nargs='?', type=argparse.FileType('r'),
+    parser.add_argument('domain_list', nargs='?', type=argparse.FileType('r', encoding="utf-8"),
                         help='指定域名列表的文件路径。')
 
     return parser.parse_args()

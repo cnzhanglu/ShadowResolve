@@ -16,23 +16,36 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-  build:
-    # Windows is currently the only platform this action supports
-    runs-on: windows-latest
+  build_and_release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu-latest
+            version: '3.7'  # 使用最新的 Python 3.x 版本
+          - name: windows-latest
+            version: '3.7'  # 使用最新的 Python 3.x 版本
+          - name: macos-latest
+            version: '3.11'  # 使用最新的 Python 3.x 版本
 
     steps:
 
       # Check-out repository
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       # Setup Python
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          python-version: ${{ matrix.version }} # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
           cache: 'pip'
           cache-dependency-path: |
             **/requirements*.txt
+            ubuntu/**/requirements*.txt
+            windows/**/requirements*.txt
+            macos/**/requirements*.txt
 
       # Install dependencies
       - name: Install Dependencies
@@ -40,25 +53,53 @@ jobs:
           pip install -r requirements.txt
 
       # Build python script into a stand-alone exe
-      - name: Build Executable
+      - name: Build Executable Windows
+        if: matrix.os == 'windows-latest'
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
           script-name: Query.py
           onefile: false
           standalone: true
-          output-dir: o/Windows/ShadowResolve_win10
+          output-dir: o
 
-      - name: Compress files
+      # Build python script into a stand-alone exe
+      - name: Build Executable Linux
+        if: matrix.os == 'ubuntu-latest'
+        uses: Nuitka/Nuitka-Action@main
+        with:
+          nuitka-version: main
+          script-name: Query.py
+          onefile: false
+          standalone: true
+          output-dir: o
+
+      - name: Compress files windows
+        if: matrix.os == 'windows-latest'
         run: |
-          Compress-Archive -Path "o\Windows\ShadowResolve_win10\*.dist" -DestinationPath "ShadowResolve_win.zip"
+          Rename-Item -Path "o\Query.dist" -NewName "o\ShadowResolve"
+          Compress-Archive -Path "o\ShadowResolve" -DestinationPath "ShadowResolve_win.zip"
+
+      - name: Compress files linux
+        if: matrix.os == 'Ubuntu-latest'
+        run: |
+          mv o/Query.dist o/ShadowResolve
+          tar -zcvf ShadowResolve_linux.tar.gz -C o ShadowResolve
+
+      - name: Compress files macos
+        if: matrix.os == 'macos-latest'
+        run: |
+          mv o/Query.dist o/ShadowResolve
+          tar -zcvf ShadowResolve_macos.tar.gz -C o ShadowResolve
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
             name: ${{ runner.os }} Build
             path: |
-              ShadowResolve_win.zip
+              *.zip
+              *.tar.gz
+              *.dmg
 
       - name: Get Current Date
         id: get_date
@@ -83,6 +124,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ShadowResolve_win.zip
-          asset_name: ShadowResolve_win.zip
+          asset_path: |
+            *.zip
+            *.tar.gz
+            *.dmg
+          asset_name: |
+            ShadowResolve_win.zip
+            ShadowResolve_linux.tar.gz
+            ShadowResolve_mac.dmg
           asset_content_type: application/octet-stream

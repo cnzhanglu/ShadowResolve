@@ -73,6 +73,16 @@ jobs:
           onefile: false
           standalone: true
           output-dir: o
+      # Build python script into a stand-alone exe
+      - name: Build Executable macos
+        if: matrix.os == 'macos-latest'
+        uses: Nuitka/Nuitka-Action@main
+        with:
+          nuitka-version: main
+          script-name: Query.py
+          onefile: false
+          standalone: true
+          output-dir: o
 
       - name: Compress files windows
         if: matrix.os == 'windows-latest'

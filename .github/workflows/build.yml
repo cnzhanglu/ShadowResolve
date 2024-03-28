@@ -129,18 +129,6 @@ jobs:
         id: get_date
         run: echo "::set-output name=date::$(date +%Y-%m-%d)"
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          tag_name: preview-${{ steps.get_date.outputs.date }}-${{ github.run_id }}
-          release_name: Development Preview Release ${{ steps.get_date.outputs.date }}-${{ github.run_id }}
-          body: Release notes go here
-          draft: false
-          prerelease: true
-
       - name: Upload Release Asset for Ubuntu
         id: upload-ubuntu
         if: matrix.os == 'ubuntu-latest'

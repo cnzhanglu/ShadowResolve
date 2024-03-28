@@ -127,19 +127,38 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Upload Release Asset for Ubuntu
+        id: upload-ubuntu
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: |
-            ShadowResolve_win.zip
-            ShadowResolve_linux.tar.gz
-            ShadowResolve_macos.tar.gz
-          asset_name: |
-            ShadowResolve_win.zip
-            ShadowResolve_linux.tar.gz
-            ShadowResolve_macos.tar.gz
+          asset_path: ShadowResolve_linux.tar.gz
+          asset_name: ShadowResolve_linux.tar.gz
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset for Windows
+        id: upload-windows
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ShadowResolve_win.zip
+          asset_name: ShadowResolve_win.zip
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset for MacOS
+        id: upload-macos
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ShadowResolve_macos.tar.gz
+          asset_name: ShadowResolve_macos.tar.gz
           asset_content_type: application/octet-stream

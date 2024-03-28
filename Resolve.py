@@ -128,6 +128,8 @@ class DNSHandler:
                                     extracted_ips_au.append(additional.to_text())
                         # print(';'.join(extracted_ips_au))
                         return "NoAnswer", domain, record_type, ';'.join(extracted_ips_au)
+                    else:
+                        return "NoAnswerNoAuthority", domain, record_type, ''
                 else:
                     return rcode_to_string(rcode), domain, record_type, ""
             else:

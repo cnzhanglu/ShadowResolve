@@ -51,7 +51,7 @@ jobs:
 
       - name: Compress files
         run: |
-          zip -r ShadowResolve_win.zip o/Windows/ShadowResolve_win10/*.dist
+          Compress-Archive -Path "o\Windows\ShadowResolve_win10\*.dist" -DestinationPath "ShadowResolve_win.zip"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3

@@ -15,22 +15,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  create_release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          tag_name: preview-${{ steps.get_date.outputs.date }}-${{ github.run_id }}
-          release_name: Development Preview Release ${{ steps.get_date.outputs.date }}-${{ github.run_id }}
-          body: Release notes go here
-          draft: false
-          prerelease: true
-
-  build_and_release:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -116,18 +101,45 @@ jobs:
           mv o/Query.dist o/ShadowResolve
           tar -zcvf ShadowResolve_macos.tar.gz -C o ShadowResolve
 
-      - name: Upload Artifacts
+      - name: Upload Artifacts for Ubuntu
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3
         with:
-            name: ${{ runner.os }} Build
-            path: |
-              *.zip
-              *.tar.gz
-              *.dmg
+          name: ${{ runner.os }} Build
+          path: |
+            ShadowResolve_linux.tar.gz
 
+      - name: Upload Artifacts for Windows
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ runner.os }} Build
+          path: |
+            ShadowResolve_win.zip
+
+      - name: Upload Artifacts for MacOS
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ runner.os }} Build
+          path: |
+            ShadowResolve_macos.tar.gz
+
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
       - name: Get Current Date
         id: get_date
         run: echo "::set-output name=date::$(date +%Y-%m-%d)"
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: |
+            ShadowResolve_linux.tar.gz
+            ShadowResolve_win.zip
+            ShadowResolve_macos.tar.gz
+          path: artifacts
 
       - name: Create Release
         id: create_release
@@ -141,38 +153,18 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Upload Release Asset for Ubuntu
-        id: upload-ubuntu
-        if: matrix.os == 'ubuntu-latest'
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ShadowResolve_linux.tar.gz
-          asset_name: ShadowResolve_linux.tar.gz
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset for Windows
-        id: upload-windows
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ShadowResolve_win.zip
-          asset_name: ShadowResolve_win.zip
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset for MacOS
-        id: upload-macos
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ShadowResolve_macos.tar.gz
-          asset_name: ShadowResolve_macos.tar.gz
+          asset_path: |
+            ShadowResolve_linux.tar.gz
+            ShadowResolve_win.zip
+            ShadowResolve_macos.tar.gz
+          asset_name: |
+            ShadowResolve_linux.tar.gz
+            ShadowResolve_win.zip
+            ShadowResolve_macos.tar.gz
           asset_content_type: application/octet-stream

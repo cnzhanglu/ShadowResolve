@@ -83,12 +83,21 @@ jobs:
           standalone: true
           output-dir: o
 
-      - name: Compress files windows
+      - name: rename windows
         if: matrix.os == 'windows-latest'
         run: |
           Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve"
           Get-ChildItem -Path o -Recurse
+
+      - name: zip files windows
+        if: matrix.os == 'windows-latest'
+        run: |
           Compress-Archive -Path "o\ShadowResolve" -DestinationPath "ShadowResolve_win.zip"
+          Get-ChildItem -Path . -Recurse
+
+      - name: ls dir windows
+        if: matrix.os == 'windows-latest'
+        run: |
           Get-ChildItem -Path . -Recurse
 
       - name: Compress files linux
@@ -107,25 +116,22 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ runner.os }} Build
-          path: |
-            ShadowResolve_linux.tar.gz
+          name: ubuntu Build
+          path: ShadowResolve_linux.tar.gz
 
       - name: Upload Artifacts for Windows
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ runner.os }} Build
-          path: |
-            ShadowResolve_win.zip
+          name: windows Build
+          path: ShadowResolve_win.zip
 
       - name: Upload Artifacts for MacOS
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ runner.os }} Build
-          path: |
-            ShadowResolve_macos.tar.gz
+          name: macos Build
+          path: ShadowResolve_macos.tar.gz
 
   create_release:
     needs: build
@@ -137,21 +143,6 @@ jobs:
 
       - name: Download Linux Artifact
         uses: actions/download-artifact@v2
-        with:
-          name: ShadowResolve_linux.tar.gz
-          path: artifacts
-
-      - name: Download Windows Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ShadowResolve_win.zip
-          path: artifacts
-
-      - name: Download macOS Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ShadowResolve_macos.tar.gz
-          path: artifacts
 
       - name: Create Release
         id: create_release
@@ -174,6 +165,7 @@ jobs:
           asset_path: ShadowResolve_linux.tar.gz
           asset_name: ShadowResolve_linux.tar.gz
           asset_content_type: application/octet-stream
+        continue-on-error: true
 
       - name: Upload Windows Artifact
         uses: actions/upload-release-asset@v1
@@ -184,6 +176,7 @@ jobs:
           asset_path: ShadowResolve_win.zip
           asset_name: ShadowResolve_win.zip
           asset_content_type: application/octet-stream
+        continue-on-error: true
 
       - name: Upload macOS Artifact
         uses: actions/upload-release-asset@v1
@@ -194,3 +187,4 @@ jobs:
           asset_path: ShadowResolve_macos.tar.gz
           asset_name: ShadowResolve_macos.tar.gz
           asset_content_type: application/octet-stream
+        continue-on-error: true

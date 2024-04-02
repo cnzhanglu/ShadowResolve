@@ -87,7 +87,9 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve"
+          Get-ChildItem -Path o -Recurse
           Compress-Archive -Path "o\ShadowResolve" -DestinationPath "ShadowResolve_win.zip"
+          Get-ChildItem -Path . -Recurse
 
       - name: Compress files linux
         if: matrix.os == 'Ubuntu-latest'
@@ -133,13 +135,22 @@ jobs:
         id: get_date
         run: echo "::set-output name=date::$(date +%Y-%m-%d)"
 
-      - name: Download Artifacts
+      - name: Download Linux Artifact
         uses: actions/download-artifact@v2
         with:
-          name: |
-            ShadowResolve_linux.tar.gz
-            ShadowResolve_win.zip
-            ShadowResolve_macos.tar.gz
+          name: ShadowResolve_linux.tar.gz
+          path: artifacts
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ShadowResolve_win.zip
+          path: artifacts
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ShadowResolve_macos.tar.gz
           path: artifacts
 
       - name: Create Release
@@ -154,18 +165,32 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Upload Release Asset
+      - name: Upload Linux Artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: |
-            ShadowResolve_linux.tar.gz
-            ShadowResolve_win.zip
-            ShadowResolve_macos.tar.gz
-          asset_name: |
-            ShadowResolve_linux.tar.gz
-            ShadowResolve_win.zip
-            ShadowResolve_macos.tar.gz
+          asset_path: ShadowResolve_linux.tar.gz
+          asset_name: ShadowResolve_linux.tar.gz
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ShadowResolve_win.zip
+          asset_name: ShadowResolve_win.zip
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ShadowResolve_macos.tar.gz
+          asset_name: ShadowResolve_macos.tar.gz
           asset_content_type: application/octet-stream

@@ -21,9 +21,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            version: '3.7'  # 使用最新的 Python 3.x 版本
+            version: '3.11'  # 使用最新的 Python 3.x 版本
           - os: windows-latest
-            version: '3.7'  # 使用最新的 Python 3.x 版本
+            version: '3.11'  # 使用最新的 Python 3.x 版本
           - os: macos-latest
             version: '3.11'  # 使用最新的 Python 3.x 版本
 
@@ -177,7 +177,7 @@ jobs:
         with:
           tag_name: preview-${{ steps.get_date.outputs.date }}-${{ github.run_id }}
           release_name: Development Preview Release ${{ steps.get_date.outputs.date }}-${{ github.run_id }}
-          body: Release notes go here
+          body: python3.11
           draft: false
           prerelease: true
 

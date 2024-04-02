@@ -145,7 +145,6 @@ jobs:
         run: echo "::set-output name=date::$(date +%Y-%m-%d)"
 
       - name: Download Ubuntu Artifact
-        if: matrix.os == 'ubuntu-latest'
         uses: actions/download-artifact@v3
         with:
           name: ubuntu Build
@@ -153,7 +152,6 @@ jobs:
           continue-on-error: true  # 添加此参数以忽略下载失败
 
       - name: Download Windows Artifact
-        if: matrix.os == 'windows-latest'
         uses: actions/download-artifact@v3
         with:
           name: windows Build
@@ -161,7 +159,6 @@ jobs:
           continue-on-error: true  # 添加此参数以忽略下载失败
 
       - name: Download MacOS Artifact
-        if: matrix.os == 'macos-latest'
         uses: actions/download-artifact@v3
         with:
           name: macos Build

@@ -149,8 +149,7 @@ jobs:
       - name: Install Python 3.7
         run: |
           yum install -y epel-release
-          yum install -y python3 python3-devel
-          yum install -y gcc
+          yum install -y python3 python3-devel patchelf gcc
 
       - name: Install dependencies
         run: |

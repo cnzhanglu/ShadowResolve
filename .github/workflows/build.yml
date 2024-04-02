@@ -150,6 +150,7 @@ jobs:
         run: |
           yum install -y epel-release
           yum install -y python3
+          yum install -y gcc
 
       - name: Install dependencies
         run: |

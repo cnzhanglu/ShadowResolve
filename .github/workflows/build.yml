@@ -160,7 +160,7 @@ jobs:
       - name: Install Build Executable Nuitka
         run: |
           python3 -m pip install nuitka
-          python3 -m pip nuitka --standalone --output-dir=o --assume-yes-for-downloads --script-name=Query.py
+          python3 -m nuitka --standalone --output-dir=o --assume-yes-for-downloads --script-name=Query.py
 
       - name: Compress files linux
         run: |

@@ -91,7 +91,7 @@ jobs:
       - name: rename windows
         if: matrix.os == 'windows-latest'
         run: |
-          Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve"
+          Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve" -Recurse
 
       - name: zip files windows
         if: matrix.os == 'windows-latest'
@@ -144,10 +144,33 @@ jobs:
         id: get_date
         run: echo "::set-output name=date::$(date +%Y-%m-%d)"
 
-      - name: Download Linux Artifact
-        uses: actions/download-artifact@v2
+      - name: Download Ubuntu Artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/download-artifact@v3
         with:
-          extract: true
+          name: ubuntu Build
+          path: .
+          continue-on-error: true  # 添加此参数以忽略下载失败
+
+      - name: Download Windows Artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/download-artifact@v3
+        with:
+          name: windows Build
+          path: .
+          continue-on-error: true  # 添加此参数以忽略下载失败
+
+      - name: Download MacOS Artifact
+        if: matrix.os == 'macos-latest'
+        uses: actions/download-artifact@v3
+        with:
+          name: macos Build
+          path: .
+          continue-on-error: true  # 添加此参数以忽略下载失败
+
+      - name: ls dir
+        run: |
+          ls -l
 
       - name: Create Release
         id: create_release

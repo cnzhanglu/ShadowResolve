@@ -86,7 +86,7 @@ jobs:
       - name: Compress files windows
         if: matrix.os == 'windows-latest'
         run: |
-          Rename-Item -Path "o\Query.dist" -NewName "o\ShadowResolve"
+          Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve"
           Compress-Archive -Path "o\ShadowResolve" -DestinationPath "ShadowResolve_win.zip"
 
       - name: Compress files linux
@@ -126,6 +126,7 @@ jobs:
             ShadowResolve_macos.tar.gz
 
   create_release:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Get Current Date

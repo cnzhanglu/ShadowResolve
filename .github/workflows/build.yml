@@ -51,6 +51,10 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Install 7zip
+        run: |
+          choco install 7zip
+
       # Build python script into a stand-alone exe
       - name: Build Executable Windows
         if: matrix.os == 'windows-latest'
@@ -87,13 +91,11 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           Copy-Item -Path "o\Query.dist" -Destination "o\ShadowResolve"
-          Get-ChildItem -Path o -Recurse
 
       - name: zip files windows
         if: matrix.os == 'windows-latest'
         run: |
-          Compress-Archive -Path "o\ShadowResolve" -DestinationPath "ShadowResolve_win.zip"
-          Get-ChildItem -Path . -Recurse
+          7z a ShadowResolve_win.zip .\o\ShadowResolve
 
       - name: ls dir windows
         if: matrix.os == 'windows-latest'
@@ -143,6 +145,8 @@ jobs:
 
       - name: Download Linux Artifact
         uses: actions/download-artifact@v2
+        with:
+          extract: true
 
       - name: Create Release
         id: create_release

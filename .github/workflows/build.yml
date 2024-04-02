@@ -166,8 +166,7 @@ jobs:
           mv o/Query.dist o/ShadowResolve
           tar -zcvf ShadowResolve_Centos7.8.2003.tar.gz -C o ShadowResolve
 
-      - name: Upload Artifacts for Ubuntu
-        if: matrix.os == 'ubuntu-latest'
+      - name: Upload Artifacts for centos7
         uses: actions/upload-artifact@v3
         with:
           name: Centos7.8.2003 Build

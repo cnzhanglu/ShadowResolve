@@ -139,22 +139,16 @@ jobs:
   build_centos7:
     name: build_centos7
     runs-on: ubuntu-latest
-    container: docker.io/centos:7.8.2003
+    container: docker.io/cnzhanglu/nuitka_build_os:centos7.8.2003
     steps:
 
       # Check-out repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Python 3.7
-        run: |
-          yum install -y epel-release
-          yum install -y python3 python3-devel patchelf gcc gcc-c++ make
-
       - name: Install dependencies
         run: |
           python3 -m pip install -r requirements.txt
-          python3 -m pip install nuitka
 
       - name: Install Build Executable Nuitka
         run: |
